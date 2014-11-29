@@ -425,9 +425,9 @@ def()(function() {
             }
 
             if(isBEM && jsParams) {
-                this._str += ' data-bem="' +
-                    this.attrEscape(JSON.stringify(jsParams)) +
-                    '"';
+                this._str += ' data-bem=\'' +
+                    this.xmlEscape(JSON.stringify(jsParams)).replace(/'/g, '&#39;') +
+                    '\'';
             }
 
             var attrs = apply('attrs');
