@@ -10,7 +10,7 @@
 
 ### `isFunction`
 
-Метод проверяет является ли переданный ему аргументом объект функцией. В случае, если является, метод возвращает `true`.
+Метод проверяет, является ли переданный ему аргументом объект функцией. В случае, если является, метод возвращает `true`.
 
 ```js
 modules.require(['functions'], function(func) {
@@ -51,64 +51,61 @@ modules.require(['functions'], function(func) {
 
 Декоратор принимает следующие аргументы:
 
-* `fn` `{Function}` — оригинальная функция.
-* `timeout` `{Number}` — время задержки в миллисекундах.
-* `invokeAsap` `{Boolean}` — режим работы `debounce`. По умолчанию используется первый (соответствует значению `false`).
-* `context` `{Object}` — контекст для выполнения оригинальной функции.
+* `fn` `{Function}` — оригинальная функция;
+* `timeout` `{Number}` — время задержки в миллисекундах;
+* `invokeAsap` `{Boolean}` — режим работы `debounce`. По умолчанию используется первый (соответствует значению `false`);
+* `context` `{Object}` — контекст для выполнения оригинальной функции;
 
 Для примера рассмотрим форму, при вводе данных в которую, на сервер должен отправляться запрос. Посылать запросы при каждом нажатии клавиши пользователем – слишком затратно. Можно декорировать обработчик и запрос будет отправляться через 500 миллисекунд после того, как пользователь прекратил ввод:
 
 ```js
-modules.define('debounce-form', ['i-bem__dom', 'functions__debounce'], 
-function(provide, BEMDOM, debounce) {
-provide(BEMDOM.decl(this.name, {
-    onSetMod: {
-        js: {
-            inited: function() {
-                this.bindTo('input', 
-                this.findBlockInside('input'), 
-                debounce(this._sendRequest, 500));
-            }
-        }
-    },
-    _sendRequest: function() { console.log('request'); }
-}));
+modules.define('input', ['i-bem__dom', 'functions__debounce'], 
+    function(provide, BEMDOM, debounce) {
+        provide(BEMDOM.decl(this.name, {
+            onSetMod: {
+                js: {
+                    inited: function() {
+                        this.on('change', debounce(this._sendRequest, 500));
+                    }
+                }
+            },
+            _sendRequest: function() { console.log('request'); }
+    }));
 });
-
 ```
 
 
 ### `throttle`
 
-Декоратор позволяет «затормозить» функцию. Она будет выполняться не чаще одного раза в указанный период, сколько бы раз в течение этого периода не была вызвана. Все промежуточные вызовы будут игнорироваться.
+Декоратор позволяет «затормозить» функцию. Она будет выполняться не чаще одного раза в указанный период, сколько бы раз в течение этого периода ни была вызвана. Все промежуточные вызовы будут игнорироваться.
 
 Декоратор принимает следующие аргументы:
 
-* `fn` `{Function}` — оригинальная функция.
-* `period` `{Number}` — интервал между вызовами в миллисекундах.
-* `context` `{Object}` — контекст для выполнения оригинальной функции.
+* `fn` `{Function}` — оригинальная функция;
+* `period` `{Number}` — интервал между вызовами в миллисекундах;
+* `context` `{Object}` — контекст для выполнения оригинальной функции;
 
 Метод удобно использовать, например, для установки ресурсоемких обработчиков для часто генерируемых событий – `resize`, `pointermove` и т.п.:
 
 ```js
 modules.define('slowdown', ['i-bem__dom', 'functions__throttle'], 
-function(provide, BEMDOM, throttle) {
-provide(BEMDOM.decl(this.name, {
-    onSetMod : {
-        'js' : {
-            'inited' : function() { 
-                this.bindTo('pointermove', throttle(this._heavyLoad, 300)); 
+    function(provide, BEMDOM, throttle) {
+        provide(BEMDOM.decl(this.name, {
+            onSetMod : {
+                'js' : {
+                    'inited' : function() { 
+                        this.bindTo('pointermove', throttle(this._heavyLoad, 300)); 
+                    },
+
+                    '' : function() {
+                        this.unbindFrom('pointermove', throttle(this._heavyLoad, 300));
+                    }
+                },
+
             },
-
-            '' : function() {
-                this.unbindFrom('pointermove', throttle(this._heavyLoad, 300));
-            }
-        },
-
-    },
-    _heavyLoad : function() { console.log('message'); }
-}));
+            _heavyLoad : function() { console.log('message'); }
+    }));
 });
 ```
 
-В результате функция будет выполняться не чаще чем раз в 300 миллисекунд.
+В результате, функция будет выполняться не чаще чем раз в 300 миллисекунд.
