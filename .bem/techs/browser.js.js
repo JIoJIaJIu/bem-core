@@ -22,11 +22,6 @@ exports.techMixin = {
         return {
             'js' : this.getSuffixes()
         };
-    },
-
-    getYmChunk : function() {
-        var ymRelPath = this.__base.apply(this, arguments);
-        return this.getBuildResultChunk(ymRelPath, PATH.resolve(this.context.level.dir, ymRelPath));
     }
 
 };
